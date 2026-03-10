@@ -81,9 +81,7 @@ const Home = () => {
           ))
         ) : (
           <p className="text-center w-full text-gray-400 py-10">
-            {showFavoritesOnly
-              ? "No favorites yet. Click the heart icon to add favorites!"
-              : "No templates yet. Create one!"}
+              No templates yet. Create one!"
           </p>
         )}
       </div>
