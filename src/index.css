@@ -1,0 +1,57 @@
+@import 'tailwindcss';
+
+@layer base {
+  body {
+background-color:rgb(16, 16, 34);
+color: white;  }
+
+  hr{
+    border: 1px solid rgb(104, 115, 103);
+  }
+  
+  .form{
+    background-color: rgb(41, 38, 90);
+    padding: 10px 20px 5px 20px;
+    border-radius: 20px;
+  }
+
+  .form h1{
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 1px;
+  }
+
+  .form h3{
+    border: 1px solid rgb(163, 4, 255);
+    padding: 10px;
+  }
+  
+  .form input{
+    border: 1px solid rgb(163, 4, 255);
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+  }
+
+  .form input:focus{
+    outline: none;
+  }
+
+  .form textarea{
+    border: 1px solid  rgb(163, 4, 255);
+    padding: 10px;
+    height: 25vh;
+    border-radius: 10px;
+  }
+
+  .form textarea:focus{
+    outline: none;
+  }
+}
+
+@layer components{
+  .save{
+    background-color: blueviolet;
+  }
+}
