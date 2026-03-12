@@ -1,45 +1,93 @@
 import { useContext, useState } from "react";
 import { MailContext } from "../context/MailContext";
-import { Edit, Heart, Trash2 } from "lucide-react";
+import { Edit, Heart, Trash2, ArrowRight, Check, Copy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import TemplateDetails from "../components/TemplateDetails";
-import clsx from "clsx";
+import AlertModal from "../components/AlertModal";
 
 const Home = () => {
   const { mails, deleteMail, toggleFavorites } = useContext(MailContext);
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
- 
+  const [alert, setAlert] = useState(false);
+  const [delId, setDelId] = useState(null);
+  const [copy, setCopy] = useState(false)
 
   const handleUpdate = (id) => {
     navigate(`/create/${id}`);
   };
 
+  const openAlert = (id) => {
+    setAlert(true);
+    setDelId(id);
+  };
+
+  const handleCopy = async (mail) => {
+    const template = `Subject: ${mail.name} \n\n Body: ${mail.body}`
+    try {
+      await navigator.clipboard.writeText(template)
+    } catch (error) {
+      console.error('Failed to copy', error)
+    }
+    setCopy(true)
+  }
+
+  const handleDelete = () => {
+    if (delId) {
+      deleteMail(delId);
+      setAlert(false);
+      setDelId(null);
+    }
+  };
+
+  const greetTime = () => {
+    const hours = new Date().getHours();
+    if (hours < 12) return "Good Morning";
+    if (hours < 17) return "Good Afternoon";
+    return "Good Evening";
+  };
+
   return (
     <div className="mx-5 my-5">
       <div>
-        <h1 className="w-30 bg-slate-500 py-1 px-2 text-center rounded-lg">
-          DASHBOARD
-        </h1>
+        <div className="flex">
+          <h1 className="w-30 bg-slate-500 py-1 px-2 text-center rounded-lg">
+            DASHBOARD
+          </h1>
+        </div>
+
         <hr className="border-slate-500 my-1" />
+        <p className=" font-bold italic text-2xl pt-2">{greetTime()}</p>
         <h1 className="text-4xl max-md:text-3xl italic font-bold py-5">
           YOUR EMAIL TEMPLATE STORAGE PLATFORM
         </h1>
       </div>
 
       <div className="flex max-md:flex-col max-md:items-center gap-5 max-md:gap-3 mx-5 my-10">
+        <div>
+          {mails.length > 0 && (
+            <h1
+              className="fixed right-6 flex -my-5 cursor-pointer underline"
+              onClick={() => navigate(`/my-templates`)}
+            >
+              <span className="flex">
+                View All
+                <ArrowRight />
+              </span>
+            </h1>
+          )}
+        </div>
         {mails.length > 0 ? (
-          mails.map((m) => (
+          mails.slice(0, 3).map((m) => (
             <div
               key={m.id}
               className={
                 "bg-slate-500 flex flex-col mb-2 w-xs rounded-lg h-50 group hover:scale-104 transition-all"
-                
               }
             >
               <div className="max-w-md">
                 <div
-                  className="flex flex-col items-center py-5"
+                  className="flex flex-col items-center hover:cursor-pointer py-5"
                   onClick={() => setOpen((o) => !o)}
                 >
                   <h1 className="font-bold text-xl">{m.name}</h1>
@@ -47,7 +95,7 @@ const Home = () => {
                 </div>
 
                 {/* Favorite Button */}
-                <div className="mt-15 flex items-center justify-center">
+                <div className="mt-15 flex items-center justify-center gap-4">
                   <button
                     onClick={() => toggleFavorites(m.id)}
                     className="transition-transform hover:scale-110"
@@ -57,6 +105,9 @@ const Home = () => {
                     ) : (
                       <Heart color="white" size={24} />
                     )}
+                  </button>
+                  <button className="bg-gray-600 rounded-md py-1 px-1" onClick={()=>handleCopy(m)}>
+                    {copy ? <Check /> : <Copy />}
                   </button>
                 </div>
 
@@ -69,7 +120,7 @@ const Home = () => {
                       <Edit />
                     </button>
                     <button
-                      onClick={() => deleteMail(m.id)}
+                      onClick={() => openAlert(m.id)}
                       className="bg-slate-900 py-1 px-2 rounded-lg"
                     >
                       <Trash2 />
@@ -81,7 +132,7 @@ const Home = () => {
           ))
         ) : (
           <p className="text-center w-full text-gray-400 py-10">
-              No templates yet. Create one!"
+            No templates yet. Create one!"
           </p>
         )}
       </div>
@@ -93,6 +144,19 @@ const Home = () => {
             className="fixed left-0 top-0 w-full min-h-screen"
           >
             <TemplateDetails hide={setOpen} />
+          </div>
+        )}
+      </div>
+      <div>
+        {alert && (
+          <div>
+            <AlertModal
+              isOpen={setAlert}
+              title={"Delete Template"}
+              message={"Are you sure you want to deleteMessage"}
+              onClose={() => setAlert(false)}
+              onConfirm={handleDelete}
+            />
           </div>
         )}
       </div>
