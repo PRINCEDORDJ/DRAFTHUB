@@ -3,12 +3,15 @@ import { MailContext } from "../context/MailContext";
 import { Check, Copy, Edit, Heart, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import TemplateDetails from "../components/TemplateDetails";
+import AlertModal from "../components/AlertModal";
 
 const Favorites = () => {
   const { mails, deleteMail, toggleFavorites } = useContext(MailContext);
   const navigate = useNavigate();
   const [open, setOpen] = useState(false)
+  const [delId, setDelId] = useState(null)
   const [copy, setCopy] = useState(null)
+  const [alert, setAlert] = useState(false)
   // Filter only favorites
   const favoriteMails = mails.filter((m) => m.isFavorites);
 
@@ -16,7 +19,20 @@ const Favorites = () => {
      const template = `Subject: ${mail.name} \n\n Body: ${mail.body}`;
      await navigator.clipboard.writeText(template);
      setCopy(true);
-   };
+  };
+  
+  const openAlert = (id) => {
+    setAlert(true);
+    setDelId(id);
+  };
+
+  const handleDelete = () => {
+    if (delId) {
+      deleteMail(delId)
+      setAlert(false)
+      setDelId(null)
+    }
+  }
 
   const handleUpdate = (id) => {
     navigate(`/create/${id}`);
@@ -72,7 +88,7 @@ const Favorites = () => {
                       <Edit />
                     </button>
                     <button
-                      onClick={() => deleteMail(m.id)}
+                      onClick={() => openAlert(m.id)}
                       className="bg-slate-900 py-1 px-2 rounded-lg"
                     >
                       <Trash2 />
@@ -102,6 +118,19 @@ const Favorites = () => {
           </div>
         )}
       </div>
+      <div>
+              {alert && (
+                <div>
+                  <AlertModal
+                    isOpen={setAlert}
+                    title={"Delete Template"}
+                    message={"Are you sure you want to deleteMessage"}
+                    onClose={() => setAlert(false)}
+                    onConfirm={handleDelete}
+                  />
+                </div>
+              )}
+            </div>
     </div>
   );
 };
