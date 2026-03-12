@@ -1,15 +1,38 @@
-import React, { useContext, useState } from 'react'
-import { MailContext } from '../context/MailContext'
-import { Trash2, Edit, Heart } from 'lucide-react'
-import TemplateDetails from '../components/TemplateDetails'
+import { useContext, useState } from "react";
+import { MailContext } from "../context/MailContext";
+import { Trash2, Edit, Heart, Copy, Check } from "lucide-react";
+import TemplateDetails from "../components/TemplateDetails";
+import AlertModal from "../components/AlertModal";
 
 const Template = () => {
-  const {mails, deleteMail, toggleFavorites} = useContext(MailContext)
-  const [open, setOpen] = useState(false)
+  const { mails, deleteMail, toggleFavorites } = useContext(MailContext);
+  const [open, setOpen] = useState(false);
+   const [alert, setAlert] = useState(false);
+  const [delId, setDelId] = useState(null);
+  const [copy, setCopy] = useState(null)
 
-   const handleUpdate = (id) => {
-     navigate(`/create/${id}`);
-   };
+  const handleUpdate = (id) => {
+    navigate(`/create/${id}`);
+  };
+
+  const handleCopy = async (mail) => {
+    const template = `Subject: ${mail.name} \n\n Body: ${mail.body}`
+    await navigator.clipboard.writeText(template)
+    setCopy(true)
+}
+
+  const openAlert = (id) => {
+    setAlert(true);
+    setDelId(id);
+  };
+
+  const handleDelete = () => {
+    if (delId) {
+      deleteMail(delId);
+      setAlert(false);
+      setDelId(null);
+    }
+  };
 
   return (
     <div>
@@ -38,7 +61,7 @@ const Template = () => {
                 </div>
 
                 {/* Favorite Button */}
-                <div className="mt-15 flex items-center justify-center">
+                <div className="mt-15 flex items-center justify-center gap-4">
                   <button
                     onClick={() => toggleFavorites(m.id)}
                     className="transition-transform hover:scale-110"
@@ -48,6 +71,9 @@ const Template = () => {
                     ) : (
                       <Heart color="white" size={24} />
                     )}
+                  </button>
+                  <button className="bg-gray-600 py-1 px-1 rounded-md" onClick={()=>handleCopy(m)}>
+                    {copy ? <Check /> : <Copy />}
                   </button>
                 </div>
 
@@ -60,7 +86,7 @@ const Template = () => {
                       <Edit />
                     </button>
                     <button
-                      onClick={() => deleteMail(m.id)}
+                      onClick={() => openAlert(m.id)}
                       className="bg-slate-900 py-1 px-2 rounded-lg"
                     >
                       <Trash2 />
@@ -72,8 +98,7 @@ const Template = () => {
           ))
         ) : (
           <p className="text-center w-full text-gray-400 py-10">
-            
-              No templates yet. Create one!
+            No templates yet. Create one!
           </p>
         )}
       </div>
@@ -88,8 +113,21 @@ const Template = () => {
           </div>
         )}
       </div>
+      <div>
+        {alert && (
+          <div>
+            <AlertModal
+              isOpen={setAlert}
+              title={"Delete Template"}
+              message={"Are you sure you want to deleteMessage"}
+              onClose={() => setAlert(false)}
+              onConfirm={handleDelete}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
-}
+};
 
-export default Template
+export default Template;

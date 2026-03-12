@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { MailContext } from "../context/MailContext";
-import { Edit, Heart, Trash2 } from "lucide-react";
+import { Check, Copy, Edit, Heart, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import TemplateDetails from "../components/TemplateDetails";
 
@@ -8,9 +8,15 @@ const Favorites = () => {
   const { mails, deleteMail, toggleFavorites } = useContext(MailContext);
   const navigate = useNavigate();
   const [open, setOpen] = useState(false)
-
+  const [copy, setCopy] = useState(null)
   // Filter only favorites
   const favoriteMails = mails.filter((m) => m.isFavorites);
+
+   const handleCopy = async (mail) => {
+     const template = `Subject: ${mail.name} \n\n Body: ${mail.body}`;
+     await navigator.clipboard.writeText(template);
+     setCopy(true);
+   };
 
   const handleUpdate = (id) => {
     navigate(`/create/${id}`);
@@ -45,12 +51,15 @@ const Favorites = () => {
                 </div>
 
                 {/* Favorite Button */}
-                <div className="mt-15 flex items-center justify-center">
+                <div className="mt-15 flex items-center justify-center gap-4">
                   <button
                     onClick={() => toggleFavorites(m.id)}
                     className="transition-transform hover:scale-110"
                   >
                     <Heart color="red" fill="red" size={24} />
+                  </button>
+                  <button className="bg-gray-600 py-1 px-1 rounded-md" onClick={()=>handleCopy(m)}> 
+                    {copy ? <Check /> : <Copy />}
                   </button>
                 </div>
 

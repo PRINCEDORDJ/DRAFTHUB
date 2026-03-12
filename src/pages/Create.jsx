@@ -1,4 +1,3 @@
-import React from 'react'
 import TemplateEditor from '../components/TemplateEditor'
 import { useParams } from 'react-router-dom'
 
