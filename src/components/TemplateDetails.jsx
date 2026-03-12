@@ -1,9 +1,16 @@
-import { useContext } from "react"
+import { useContext, useState } from "react"
 import { MailContext } from "../context/MailContext"
 
 const TemplateDetails = ({ hide }) => {
-    const {mails} = useContext(MailContext)
+  const { mails } = useContext(MailContext)
+  const [copy, setCopy ] = useState(false)
 
+  const handleCopy = async (mail) => {
+    const template = `Subject: ${mail.subject} \n\n Body: ${mail.body}`
+    await navigator.clipboard.writeText(template)
+    setCopy(c=> !c)
+  }
+  
   return (
     <div className="bg-black/50 backdrop-blur-md w-full h-screen py-10 flex justify-center">
       <div className="form bg-slate-900 py-5 mx-5 w-4xl max-xl:h-200  max-md:w-xs  max-sm:h-165 sm:h-160">
@@ -21,12 +28,18 @@ const TemplateDetails = ({ hide }) => {
                   <input type="text" value={m.subject} disabled />
                   <h1>BODY :</h1>
                   <textarea value={m.body} disabled className="w-full" />
+                  <div className="w-full flex py-5 max-md:gap-2">
+                    <button onClick={()=>handleCopy(m)} className="bg-gray-400 px-10 rounded-lg">
+                   {copy ? "Copied" : "Copy"}
+                  </button>
                   <button
                     onClick={() => hide((o) => !o)}
-                    className="bg-purple-500 w-50 py-2 rounded-lg my-5 ml-auto"
+                    className="bg-purple-500 w-50 py-2 rounded-lg ml-auto"
                   >
                     Close
                   </button>
+                  </div>
+                  
                 </div>
                 <div>
                   <div className="bg-black w-sm rounded-lg h-120 max-lg:hidden">
